@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "context-hygiene"
-version = "0.1.0"
+version = "1.0.0"
 description = "Zero-dependency macOS CLI/TUI to audit AI coding agent instruction files."
 readme = "README.md"
 license = { text = "MIT" }

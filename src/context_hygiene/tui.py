@@ -9,6 +9,7 @@ import tty
 from pathlib import Path
 from typing import Sequence
 
+from context_hygiene import CATCHPHRASE, REPO_URL, __version__
 from context_hygiene.auditor import audit_files, remediate_dead_paths
 from context_hygiene.cli import confirm_scope, self_update
 from context_hygiene.discovery import (
@@ -20,11 +21,13 @@ from context_hygiene.discovery import (
 )
 from context_hygiene.reporter import format_terminal_report, format_token_ranking
 
-BANNER = r"""   ___ _  _ _   _  ___ 
-  / __| || | | | |/ __|
- | (__| __ | |_| | (_ |
-  \___|_||_|\__, |\___|  Context Hygiene for AI Coding Agents
-            |___/      """
+BANNER_LINES: tuple[str, ...] = (
+    r"   ___ _  _ _   _  ___ ",
+    r"  / __| || | | | |/ __|",
+    r" | (__| __ | |_| | (_ |",
+    r"  \___|_||_|\__, |\___|",
+    r"            |___/      ",
+)
 
 MENU_ITEMS: tuple[tuple[str, str], ...] = (
     ("1. Audit Repo", "Scan current project instructions & skills"),
@@ -39,6 +42,8 @@ HIDE_CURSOR = "\x1b[?25l"
 SHOW_CURSOR = "\x1b[?25h"
 BOLD = "\x1b[1m"
 DIM = "\x1b[2m"
+GREEN = "\x1b[32m"
+BLUE = "\x1b[94m"
 CYAN = "\x1b[36m"
 RESET = "\x1b[0m"
 
@@ -46,22 +51,49 @@ RESET = "\x1b[0m"
 def render_menu(selected_index: int, *, use_color: bool = True) -> str:
     """Render the Mole-inspired TUI menu string."""
     lines: list[str] = []
+
+    for idx, art_line in enumerate(BANNER_LINES):
+        styled_art = f"{GREEN}{art_line}{RESET}" if use_color else art_line
+        if idx == 2:
+            url_text = (
+                f"{BOLD}{BLUE}{REPO_URL}{RESET}" if use_color else REPO_URL
+            )
+            lines.append(f"{styled_art}   {url_text}")
+        elif idx == 3:
+            phrase_text = (
+                f"{GREEN}{CATCHPHRASE}{RESET}" if use_color else CATCHPHRASE
+            )
+            lines.append(f"{styled_art}   {phrase_text}")
+        else:
+            lines.append(styled_art)
+
+    lines.append("")
     if use_color:
-        lines.append(f"{CYAN}{BANNER}{RESET}")
+        lines.append(
+            f"Version v{__version__} · run {GREEN}chyg update{RESET} to stay current"
+        )
     else:
-        lines.append(BANNER)
+        lines.append(
+            f"Version v{__version__} · run chyg update to stay current"
+        )
     lines.append("")
 
     for idx, (label, desc) in enumerate(MENU_ITEMS):
         if idx == selected_index:
-            prefix = f"{BOLD}{CYAN}> {label:<18}{RESET}" if use_color else f"> {label:<18}"
-            lines.append(f"  {prefix} {desc}")
+            if use_color:
+                lines.append(
+                    f"{BOLD}{CYAN}➤ {label:<18} {desc}{RESET}"
+                )
+            else:
+                lines.append(f"➤ {label:<18} {desc}")
         else:
-            dim_desc = f"{DIM}{desc}{RESET}" if use_color else desc
-            lines.append(f"    {label:<18} {dim_desc}")
+            if use_color:
+                lines.append(f"  {label:<18} {DIM}{desc}{RESET}")
+            else:
+                lines.append(f"  {label:<18} {desc}")
 
     lines.append("")
-    footer = "  ↑↓ | Enter | Q Quit"
+    footer = "↑↓  |  Enter  |  Q Quit"
     lines.append(f"{DIM}{footer}{RESET}" if use_color else footer)
     return "\n".join(lines)
 

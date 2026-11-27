@@ -11,7 +11,9 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest import mock
 
+from context_hygiene import CATCHPHRASE, REPO_URL, __version__
 from context_hygiene.cli import main, self_update
+from context_hygiene.tui import render_menu
 
 
 class _FakeResponse:
@@ -84,6 +86,15 @@ class TestCLIAndSelfUpdate(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(target.read_bytes(), new_payload)
         self.assertTrue(os.access(str(target), os.X_OK))
+
+    def test_tui_render_menu_displays_url_catchphrase_and_version(self) -> None:
+        plain = render_menu(0, use_color=False)
+        self.assertIn(REPO_URL, plain)
+        self.assertIn(CATCHPHRASE, plain)
+        self.assertIn(f"v{__version__}", plain)
+        self.assertIn("chyg update", plain)
+        self.assertIn("➤ 1. Audit Repo", plain)
+        self.assertNotIn("\x1b[", plain)
 
 
 if __name__ == "__main__":
