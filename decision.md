@@ -2,6 +2,12 @@
 
 Reverse-chronological record of architectural decisions (newest at top).
 
+## [27.11.2026] — Add Read-Only `/caveman-compress` Hint for Context Budget Warnings
+- **Origin:** Human request (`feature/caveman-compress-hint`).
+- **Context:** When Rule 1 (`context-budget`) flags bloated root (`>150` lines) or skill (`>300` lines) files, users benefit from an actionable next step without breaking `chyg`'s zero-dependency, read-only, zero-telemetry design.
+- **Decision:** Emit a concise terminal hint (`↳ Hint: Run /caveman-compress <filepath> in your coding agent to shrink with a .bak backup.`) strictly on `context-budget` findings in `reporter.py`, without installing or executing any external binary.
+- **Impact:** Gives users an immediate compression workflow for bloated instruction files while preserving `chyg`'s stdlib-only, read-only guarantees.
+
 ## [27.11.2026] — Release v1.0.0 with Mole-Style TUI Header & Install Guide
 - **Origin:** Post-launch UX & documentation optimization (`feature/tui-header-readme-v1`).
 - **Context:** The initial TUI header lacked the repository URL, product catchphrase, and visible version indicator, and `README.md` needed an explicit Goal section plus installation caveats (`mkdir -p ~/.local/bin` and `$PATH`).
