@@ -1,0 +1,10 @@
+{
+  "always_on_max_lines": 150,
+  "skill_max_lines": 300,
+  "stale_days": 120,
+  "ignore_paths": [
+    "docs/archive/**"
+  ],
+  "ignore_rules": [],
+  "extra_fluff_phrases": []
+}
