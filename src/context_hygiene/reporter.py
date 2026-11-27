@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from context_hygiene.auditor import AuditReport, FileAuditResult
+from context_hygiene.auditor import AuditReport, FileAuditResult, Finding
 
 RESET = "\x1b[0m"
 BOLD = "\x1b[1m"
@@ -26,6 +26,27 @@ def _format_file_meta(res: FileAuditResult) -> str:
         f"{res.line_count} lines | ~{res.estimated_tokens:,} tokens | "
         f"age {age_str} ({res.last_modified_source})"
     )
+
+
+def _format_finding_lines(
+    res: FileAuditResult, finding: Finding, use_color: bool
+) -> list[str]:
+    loc = f"L{finding.line}: " if finding.line is not None else ""
+    color = RED if finding.severity == "error" else YELLOW
+    out = [
+        f"    {_c('•', color, use_color)} [{finding.rule_id}] {loc}{finding.message}"
+    ]
+    if finding.rule_id == "context-budget":
+        cmd = f"/caveman-compress {res.relative_path}"
+        hint_prefix = _c("↳ Hint:", CYAN, use_color)
+        hint_cmd = _c(cmd, BOLD, use_color)
+        hint_tail = _c(
+            "in your coding agent to shrink with a .bak backup.",
+            DIM,
+            use_color,
+        )
+        out.append(f"      {hint_prefix} Run {hint_cmd} {hint_tail}")
+    return out
 
 
 def format_terminal_report(report: AuditReport, *, use_color: bool = True) -> str:
@@ -59,11 +80,7 @@ def format_terminal_report(report: AuditReport, *, use_color: bool = True) -> st
                     f"{_c('(' + _format_file_meta(res) + ')', DIM, use_color)}"
                 )
                 for f in res.findings:
-                    loc = f"L{f.line}: " if f.line is not None else ""
-                    color = RED if f.severity == "error" else YELLOW
-                    lines.append(
-                        f"    {_c('•', color, use_color)} [{f.rule_id}] {loc}{f.message}"
-                    )
+                    lines.extend(_format_finding_lines(res, f, use_color))
 
         if report.warning_results:
             lines.append("")
@@ -74,10 +91,7 @@ def format_terminal_report(report: AuditReport, *, use_color: bool = True) -> st
                     f"{_c('(' + _format_file_meta(res) + ')', DIM, use_color)}"
                 )
                 for f in res.findings:
-                    loc = f"L{f.line}: " if f.line is not None else ""
-                    lines.append(
-                        f"    {_c('•', YELLOW, use_color)} [{f.rule_id}] {loc}{f.message}"
-                    )
+                    lines.extend(_format_finding_lines(res, f, use_color))
 
         if report.lean_results:
             lines.append("")

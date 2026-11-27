@@ -62,6 +62,10 @@ chyg audit --fix                     # Strip verified dead-path lines (writes .b
 chyg update                          # Download latest chyg over HTTPS and atomically replace itself
 ```
 
+### Bloat Remediation Hint
+
+Whenever Rule 1 (`context-budget`) flags a bloated instruction file (`> 150` lines for always-on root files like `CLAUDE.md`/`AGENTS.md`, or `> 300` lines for `SKILL.md`), the terminal report prints a read-only remediation hint suggesting `/caveman-compress <filepath>` in your coding agent to shrink the file with a `.bak` backup. `chyg` itself remains strictly read-only and zero-telemetry — it never installs or invokes external binaries.
+
 ## macOS TCC Privacy Guardrails
 
 - Never walks `$HOME`, `~/Desktop`, `~/Documents`, `~/Downloads`, or `~/Library` unless explicitly confirmed by the user.
