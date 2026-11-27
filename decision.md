@@ -2,6 +2,12 @@
 
 Reverse-chronological record of architectural decisions (newest at top).
 
+## [27.11.2026] — Release v1.0.0 with Mole-Style TUI Header & Install Guide
+- **Origin:** Post-launch UX & documentation optimization (`feature/tui-header-readme-v1`).
+- **Context:** The initial TUI header lacked the repository URL, product catchphrase, and visible version indicator, and `README.md` needed an explicit Goal section plus installation caveats (`mkdir -p ~/.local/bin` and `$PATH`).
+- **Decision:** Bump `chyg` to `v1.0.0`, update `tui.py` `render_menu()` to display the GitHub URL, catchphrase, and current version line analogously to `tw93/mole`, and expand `README.md` with Goal and How to Install sections.
+- **Impact:** Gives users immediate version visibility and update guidance inside the TUI and prevents first-run `curl`/`PATH` friction.
+
 ## [27.11.2026] — Align Scaffolding with Guardrail v2.0 & Harden Self-Update
 - **Origin:** Pre-publish project audit and security review.
 - **Context:** Before publishing `stefanasemota/chyg`, the repository needed guardrail v2.0 compliance (lean Python-native docs, zero legacy Node/multi-vendor plumbing) and strict URL scheme validation in `self_update()`.
